@@ -1,0 +1,63 @@
+name: Build & Test pgec-ws
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # Install Lua 5.1 properly
+      - name: Setup Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+
+      # Install LuaRocks properly
+      - name: Setup LuaRocks
+        uses: leafo/gh-actions-luarocks@v4
+
+      # Build rock (this installs dependencies automatically)
+      - name: Build rockspec
+        run: luarocks make pgec-ws-1.0-1.rockspec
+
+      # Start server
+      - name: Start pgec-server
+        run: |
+          chmod +x ./bin/pgec-server
+          ./bin/pgec-server &
+          echo $! > server.pid
+          sleep 2
+
+      # Run tests (excluding client_simple.lua)
+      - name: Run tests
+        run: |
+          for f in ./examples/*.lua; do
+            if [ "$(basename "$f")" != "client_simple.lua" ]; then
+              echo "Running $f"
+              lua "$f" || { kill $(cat server.pid); exit 1; }
+            fi
+          done
+
+      # Always stop server
+      - name: Stop server
+        if: always()
+        run: |
+          kill $(cat server.pid) || true
+
+      # Pack rock
+      - name: Pack .rock
+        run: luarocks pack pgec-ws-1.0-1.rockspec
+
+      # Upload artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pgec-ws-rock
+          path: ./pgec-ws-1.0-1.rock
