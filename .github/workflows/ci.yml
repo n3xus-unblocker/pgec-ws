@@ -10,26 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repo
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Install LuaJIT
-      - name: Setup LuaJIT
+      # 2️⃣ Install LuaJIT + LuaRocks
+      - name: Install LuaJIT + LuaRocks
         run: |
           sudo apt-get update
           sudo apt-get install -y luajit luarocks
 
-      # Set Lua environment to LuaJIT for LuaRocks
-      - name: Configure LuaRocks for LuaJIT
-        run: |
-          export LUA_PATH="./pgec/?.lua;./pgec/?/init.lua;;"
-          export LUA_CPATH="./pgec/?.so;;"
-
-      # Build rock (LuaJIT is compatible with 5.1 rockspec)
+      # 3️⃣ Build rockspec locally
       - name: Build rockspec
-        run: luarocks make pgec-ws-1.0-1.rockspec
+        run: luarocks make pgec-ws-1.0-1.rockspec --local
 
-      # Start server
+      # 4️⃣ Set LUA_PATH and LUA_CPATH so modules are found
+      - name: Set Lua paths
+        run: |
+          echo "LUA_PATH=$HOME/.luarocks/share/lua/5.1/?.lua;$HOME/.luarocks/share/lua/5.1/?/init.lua;./pgec/?.lua;./pgec/?/init.lua;;" >> $GITHUB_ENV
+          echo "LUA_CPATH=$HOME/.luarocks/lib/lua/5.1/?.so;;" >> $GITHUB_ENV
+
+      # 5️⃣ Start pgec-server
       - name: Start pgec-server
         run: |
           chmod +x ./bin/pgec-server
@@ -37,7 +38,7 @@ jobs:
           echo $! > server.pid
           sleep 2
 
-      # Run tests (excluding client_simple.lua)
+      # 6️⃣ Run tests (excluding client_simple.lua) with LuaJIT
       - name: Run tests
         run: |
           for f in ./examples/*.lua; do
@@ -47,17 +48,16 @@ jobs:
             fi
           done
 
-      # Stop server
+      # 7️⃣ Stop server
       - name: Stop server
         if: always()
-        run: |
-          kill $(cat server.pid) || true
+        run: kill $(cat server.pid) || true
 
-      # Pack rock
+      # 8️⃣ Pack the rock
       - name: Pack .rock
-        run: luarocks pack pgec-ws-1.0-1.rockspec
+        run: luarocks pack pgec-ws-1.0-1.rockspec --local
 
-      # Upload artifact
+      # 9️⃣ Upload artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
