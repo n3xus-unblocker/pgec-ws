@@ -13,17 +13,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Install Lua 5.1 properly
-      - name: Setup Lua
-        uses: leafo/gh-actions-lua@v10
-        with:
-          luaVersion: "5.1"
+      # Install LuaJIT
+      - name: Setup LuaJIT
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luajit luarocks
 
-      # Install LuaRocks properly
-      - name: Setup LuaRocks
-        uses: leafo/gh-actions-luarocks@v4
+      # Set Lua environment to LuaJIT for LuaRocks
+      - name: Configure LuaRocks for LuaJIT
+        run: |
+          export LUA_PATH="./pgec/?.lua;./pgec/?/init.lua;;"
+          export LUA_CPATH="./pgec/?.so;;"
 
-      # Build rock (this installs dependencies automatically)
+      # Build rock (LuaJIT is compatible with 5.1 rockspec)
       - name: Build rockspec
         run: luarocks make pgec-ws-1.0-1.rockspec
 
@@ -41,11 +43,11 @@ jobs:
           for f in ./examples/*.lua; do
             if [ "$(basename "$f")" != "client_simple.lua" ]; then
               echo "Running $f"
-              lua "$f" || { kill $(cat server.pid); exit 1; }
+              luajit "$f" || { kill $(cat server.pid); exit 1; }
             fi
           done
 
-      # Always stop server
+      # Stop server
       - name: Stop server
         if: always()
         run: |
