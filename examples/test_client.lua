@@ -2,8 +2,8 @@
 -- Simple PGEC Test Client (using raw socket for WebSocket handshake)
 
 local socket = require('socket')
-local protocol = require('src.protocol')
-local crypto = require('src.crypto')
+local protocol = require('pgec.protocol')
+local crypto = require('pgec.crypto')
 
 print("PGEC Test Client")
 print("================\n")
