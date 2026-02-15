@@ -39,9 +39,9 @@ run.sh client
 -  14 simple commands
 
 ## To-Do List
-- [] Add genuine end-to-end encryption
-- [] Fix fatal bugs in client and servers
-- [] To stop vibecoding
+- [ ] Add genuine end-to-end encryption
+- [ ] Fix fatal bugs in client and servers
+- [ ] To stop vibecoding
 
 ## License
 
