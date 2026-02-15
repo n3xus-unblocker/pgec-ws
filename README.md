@@ -1,4 +1,4 @@
-# PGEC-WS - Pretty Good Encrypted Chat Protocol (WebSocket)
+# Pretty Good Encrypted Chat Protocol (WebSocket)
 
 End-to-end encrypted group chat protocol with automatic key rotation and zero server logging.
 
@@ -16,29 +16,28 @@ luarocks make pgec-ws-1.0-1.rockspec
 
 ### Start Server
 ```bash
-pgec-server [host] [port]
-# Example: pgec-server 0.0.0.0 9110
+run.sh server
 ```
 
 ### Create User
 ```bash
-pgec-user
+run.sh user
 ```
 
 ### Start Client
 ```bash
-pgec-client
+run.sh client
 ```
 
 ## Features
 
-- ✅ End-to-end encryption (AES + PGP)
-- ✅ 12-hour automatic key rotation
-- ✅ Zero server logging
-- ✅ Trust-on-First-Use authentication
-- ✅ WebSocket-based
-- ✅ Cross-platform
-- ✅ 14 simple commands
+-  End-to-end encryption (AES + PGP)
+-  12-hour automatic key rotation
+-  Zero server logging
+-  Trust-on-First-Use authentication
+-  WebSocket-based
+-  Cross-platform
+-  14 simple commands
 
 ## License
 
