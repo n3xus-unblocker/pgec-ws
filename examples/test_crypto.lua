@@ -1,7 +1,7 @@
 #!/usr/bin/env luajit
 -- examples/test_crypto.lua
 
-local crypto = require('src.crypto')
+local crypto = require('pgec.crypto')
 
 print("Testing PGEC Crypto\n")
 
