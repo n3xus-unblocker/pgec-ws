@@ -4,9 +4,14 @@ End-to-end encrypted group chat protocol with automatic key rotation and zero se
 
 ## Installation
 ```bash
-luarocks install pgec-ws
+luarocks install https://github.com/n3xus-unblocker/pgec-ws/raw/main/pgec-ws-1.0-1.src.rock
 ```
-
+or
+```bash
+git clone https://github.com/n3xus-unblocker/pgec-ws.git
+cd pgec-ws
+luarocks make pgec-ws-1.0-1.rockspec
+```
 ## Usage
 
 ### Start Server
