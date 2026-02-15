@@ -13,7 +13,7 @@ description = {
       - 12-hour forced key rotation
       - Trust-on-First-Use authentication
       - WebSocket-based communication
-      - Cross-platform support (Linux, macOS, Windows)
+      - Cross-platform support (Linux, macOS, Unix-based/Unix-like operating systems)
       - Completely vibe-coded because im lazy
     Documention releasing soon pluhhhhhhhhhhhhh
    ]],
