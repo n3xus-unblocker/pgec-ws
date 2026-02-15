@@ -14,33 +14,59 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 2️⃣ Install LuaJIT + LuaRocks
-      - name: Install LuaJIT + LuaRocks
+      # 2️⃣ Install LuaJIT + LuaRocks locally
+      - name: Install LuaJIT & LuaRocks
         run: |
           sudo apt-get update
-          sudo apt-get install -y luajit luarocks
+          sudo apt-get install -y luajit libluajit-5.1-dev unzip curl git
+          curl -R -O https://luarocks.org/releases/luarocks-3.9.2.tar.gz
+          tar zxpf luarocks-3.9.2.tar.gz
+          cd luarocks-3.9.2
+          ./configure --with-lua-include=/usr/include/luajit-2.1
+          make build
+          sudo make install
+          cd ..
+          rm -rf luarocks-3.9.2 luarocks-3.9.2.tar.gz
 
-      # 3️⃣ Build rockspec locally
-      - name: Build rockspec
-        run: luarocks make pgec-ws-1.0-1.rockspec --local
-
-      # 4️⃣ Set LUA_PATH and LUA_CPATH so modules are found
-      - name: Set Lua paths
+      # 3️⃣ Install Lua dependencies locally
+      - name: Install dependencies
         run: |
-          echo "LUA_PATH=$HOME/.luarocks/share/lua/5.1/?.lua;$HOME/.luarocks/share/lua/5.1/?/init.lua;./pgec/?.lua;./pgec/?/init.lua;;" >> $GITHUB_ENV
-          echo "LUA_CPATH=$HOME/.luarocks/lib/lua/5.1/?.so;;" >> $GITHUB_ENV
+          export LUAROCKS_PREFIX=$HOME/.luarocks
+          export PATH=$HOME/.luarocks/bin:$PATH
+          luarocks install lsqlite3
+          luarocks install luasocket
+          luarocks install luabitop  # optional if needed
+          luarocks install luasec    # optional if your crypto needs it
 
-      # 5️⃣ Start pgec-server
+      # 4️⃣ Build rockspec
+      - name: Build rockspec
+        run: |
+          export LUAROCKS_PREFIX=$HOME/.luarocks
+          export PATH=$HOME/.luarocks/bin:$PATH
+          luarocks make pgec-ws-1.0-1.rockspec --local
+
+      # 5️⃣ Create test user (jigsaw)
+      - name: Create test user
+        run: |
+          export LUA_PATH="./pgec/?.lua;./pgec/?/init.lua;;"
+          export LUA_CPATH="$HOME/.luarocks/lib/lua/5.1/?.so;;"
+          luajit examples/create_user.lua jigsaw
+
+      # 6️⃣ Start server
       - name: Start pgec-server
         run: |
           chmod +x ./bin/pgec-server
+          export LUA_PATH="./pgec/?.lua;./pgec/?/init.lua;;"
+          export LUA_CPATH="$HOME/.luarocks/lib/lua/5.1/?.so;;"
           ./bin/pgec-server &
           echo $! > server.pid
           sleep 2
 
-      # 6️⃣ Run tests (excluding client_simple.lua) with LuaJIT
+      # 7️⃣ Run tests (excluding client_simple.lua)
       - name: Run tests
         run: |
+          export LUA_PATH="./pgec/?.lua;./pgec/?/init.lua;;"
+          export LUA_CPATH="$HOME/.luarocks/lib/lua/5.1/?.so;;"
           for f in ./examples/*.lua; do
             if [ "$(basename "$f")" != "client_simple.lua" ]; then
               echo "Running $f"
@@ -48,17 +74,20 @@ jobs:
             fi
           done
 
-      # 7️⃣ Stop server
+      # 8️⃣ Stop server
       - name: Stop server
         if: always()
         run: kill $(cat server.pid) || true
 
-      # 8️⃣ Pack the rock
-      - name: Pack .rock
-        run: luarocks pack pgec-ws-1.0-1.rockspec --local
+      # 9️⃣ Pack .rock
+      - name: Pack rock
+        run: |
+          export LUAROCKS_PREFIX=$HOME/.luarocks
+          export PATH=$HOME/.luarocks/bin:$PATH
+          luarocks pack pgec-ws-1.0-1.rockspec --local
 
-      # 9️⃣ Upload artifact
-      - name: Upload artifact
+      # 🔟 Upload artifact
+      - name: Upload rock artifact
         uses: actions/upload-artifact@v4
         with:
           name: pgec-ws-rock
