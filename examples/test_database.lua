@@ -1,7 +1,7 @@
 #!/usr/bin/env luajit
 -- examples/test_database.lua
 
-local Database = require('src.database')
+local Database = require('pgec.database')
 
 print("Testing PGEC Database\n")
 
