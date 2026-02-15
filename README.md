@@ -40,8 +40,9 @@ run.sh client
 
 ## To-Do List
 - [ ] Add genuine end-to-end encryption
-- [ ] Fix fatal bugs in client and servers
+- [ ] Fix Luarocks packages and fix Github Actions
 - [ ] To stop vibecoding
+- [ ] Fix some code
 
 ## License
 
