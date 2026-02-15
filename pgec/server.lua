@@ -1,12 +1,12 @@
--- src/server.lua
+-- pgec/server.lua
 -- PGEC WebSocket Server (using lua-websockets)
 
 local socket = require('socket')
 local websocket = require('websocket')
-local protocol = require('src.protocol')
-local Database = require('src.database')
-local crypto = require('src.crypto')
-local config = require('src.config')
+local protocol = require('pgec.protocol')
+local Database = require('pgec.database')
+local crypto = require('pgec.crypto')
+local config = require('pgec.config')
 
 local Server = {}
 Server.__index = Server
