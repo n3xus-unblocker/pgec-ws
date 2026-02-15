@@ -1,6 +1,6 @@
 # Pretty Good Encrypted Chat Protocol (WebSocket)
 
-End-to-end encrypted group chat protocol with automatic key rotation and zero server logging.
+Encrypted chatroom protocol with automatic key rotation and PGP + AES key encryption
 
 ## Installation
 ```bash
@@ -31,13 +31,17 @@ run.sh client
 
 ## Features
 
--  End-to-end encryption (AES + PGP)
+-  Easy encryption (AES + PGP)
 -  12-hour automatic key rotation
--  Zero server logging
 -  Trust-on-First-Use authentication
 -  WebSocket-based
--  Cross-platform
+-  Cross-platform (Linux, Mac-OS, Unix-based/Unix-like operating systems)
 -  14 simple commands
+
+## To-Do List
+- [] Add genuine end-to-end encryption
+- [] Fix fatal bugs in client and servers
+- [] To stop vibecoding
 
 ## License
 
