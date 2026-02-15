@@ -1,0 +1,29 @@
+#!/usr/bin/env luajit
+-- PGEC-WS Server Executable
+
+local pgec = require('pgec')
+
+print([[
+╔═══════════════════════════════════════╗
+║     PGEC Protocol Server v1.0         ║
+║  Pretty Good Encrypted Chat           ║
+║         WebSocket Edition             ║
+╚═══════════════════════════════════════╝
+]])
+
+-- Parse command line arguments
+local host = arg[1] or '0.0.0.0'
+local port = tonumber(arg[2]) or 9110
+
+print("Starting PGEC server...")
+print("Host: " .. host)
+print("Port: " .. port)
+print()
+
+-- Create and start server
+local server = pgec.server.new({
+   host = host,
+   port = port
+})
+
+server:start()

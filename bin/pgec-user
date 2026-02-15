@@ -1,0 +1,68 @@
+#!/usr/bin/env luajit
+-- PGEC User Management Tool
+
+-- Cross-platform path setup
+local function setup_paths()
+    local is_windows = package.config:sub(1,1) == '\\'
+    local home = os.getenv(is_windows and "USERPROFILE" or "HOME")
+    local sep = is_windows and "\\" or "/"
+    
+    if home then
+        package.path = home .. sep .. ".luarocks" .. sep .. "share" .. sep .. "lua" .. sep .. "5.1" .. sep .. "?.lua;" .. package.path
+        package.path = home .. sep .. ".luarocks" .. sep .. "share" .. sep .. "lua" .. sep .. "5.1" .. sep .. "?" .. sep .. "init.lua;" .. package.path
+        
+        if is_windows then
+            package.cpath = home .. sep .. ".luarocks" .. sep .. "lib" .. sep .. "lua" .. sep .. "5.1" .. sep .. "?.dll;" .. package.cpath
+        else
+            package.cpath = home .. sep .. ".luarocks" .. sep .. "lib" .. sep .. "lua" .. sep .. "5.1" .. sep .. "?.so;" .. package.cpath
+        end
+    end
+end
+
+setup_paths()
+
+local pgec = require('pgec')
+
+print("PGEC User Management")
+print("====================\n")
+
+io.write("Enter username: ")
+local username = io.read()
+
+io.write("Enter password: ")
+local password = io.read()
+
+print("\nGenerating keypair...")
+local keypair = pgec.crypto.generate_keypair()
+
+local uuid = pgec.crypto.generate_uuid_v7()
+local password_hash = pgec.crypto.hash_password(password)
+
+print("Creating user in database...")
+local db = pgec.database.new('pgec.db')
+local success = db:create_user(uuid, username, password_hash, keypair.public_key)
+
+if success then
+   print('\n✅ User created successfully!')
+   print('Username:', username)
+   print('UUID:', uuid)
+   
+   local private_file = username .. '_private.pem'
+   local public_file = username .. '_public.pem'
+   
+   local f = io.open(private_file, 'w')
+   f:write(keypair.private_key)
+   f:close()
+   
+   f = io.open(public_file, 'w')
+   f:write(keypair.public_key)
+   f:close()
+   
+   print('\n✅ Keys saved:')
+   print('  ' .. private_file)
+   print('  ' .. public_file)
+else
+   print('❌ Failed to create user')
+end
+
+db:close()
