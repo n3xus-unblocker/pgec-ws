@@ -12,8 +12,8 @@ package.path = home .. "/.luarocks/share/lua/5.1/?/init.lua;" .. package.path
 package.cpath = home .. "/.luarocks/lib/lua/5.1/?.so;" .. package.cpath
 
 local socket = require('socket')
-local protocol = require('src.protocol')
-local crypto = require('src.crypto')
+local protocol = require('pgec.protocol')
+local crypto = require('pgec.crypto')
 local bit = require('bit32')
 
 print([[
