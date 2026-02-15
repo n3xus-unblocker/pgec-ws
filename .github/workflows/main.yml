@@ -1,0 +1,60 @@
+name: Build & Test pgec-ws
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Lua 5.1 and LuaRocks
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lua5.1 luarocks
+
+      - name: Install rockspec
+        working-directory: ./pgec-ws
+        run: luarocks-5.1 make pgec-ws-1.0-1.rockspec
+
+      - name: Run all test scripts except client_simple.lua
+        run: |
+          echo "Starting pgec-server in background..."
+          ./pgec-ws/bin/pgec-server &
+          SERVER_PID=$!
+          sleep 2  # give server time to start
+
+          echo "Running all Lua test scripts in examples/ (excluding client_simple.lua)"
+          for f in ./pgec-ws/examples/*.lua; do
+            if [[ "$(basename $f)" != "client_simple.lua" ]]; then
+              echo "Running $f"
+              lua5.1 "$f" || { kill $SERVER_PID; exit 1; }
+            fi
+          done
+
+          echo "Stopping pgec-server..."
+          kill $SERVER_PID
+
+      - name: Pack module into .rock
+        working-directory: ./pgec-ws
+        run: luarocks-5.1 pack pgec-ws-1.0-1.rockspec
+
+      - name: Upload .rock as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: pgec-ws-rock
+          path: ./pgec-ws/pgec-ws-1.0-1.rock
+
+      - name: Upload to GitHub release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./pgec-ws/pgec-ws-1.0-1.rock
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
