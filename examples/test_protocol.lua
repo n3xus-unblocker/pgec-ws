@@ -2,7 +2,7 @@
 -- examples/test_protocol.lua
 -- Test protocol parsing
 
-local protocol = require('src.protocol')
+local protocol = require('pgec.protocol')
 
 print("Testing PGEC Protocol Parser\n")
 
