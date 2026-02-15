@@ -28,18 +28,8 @@ jobs:
           cd ..
           rm -rf luarocks-3.9.2 luarocks-3.9.2.tar.gz
 
-      # 3️⃣ Install Lua dependencies locally
-      - name: Install dependencies
-        run: |
-          export LUAROCKS_PREFIX=$HOME/.luarocks
-          export PATH=$HOME/.luarocks/bin:$PATH
-          luarocks install lsqlite3
-          luarocks install luasocket
-          luarocks install luabitop  # optional if needed
-          luarocks install luasec    # optional if your crypto needs it
-
-      # 4️⃣ Build rockspec
-      - name: Build rockspec
+      # 4️⃣ Build rockspec and install dependencies
+      - name: Build rockspec & Install dependencies
         run: |
           export LUAROCKS_PREFIX=$HOME/.luarocks
           export PATH=$HOME/.luarocks/bin:$PATH
