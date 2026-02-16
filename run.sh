@@ -9,13 +9,13 @@ export LUA_CPATH="$DIR/lua_modules/lib/lua/5.1/?.so;;"
 # Run the appropriate script using the local Lua binary
 case "$1" in
     client)
-        "$DIR/lua" "$DIR/bin/pgec-client"
+        "luajit" "$DIR/bin/pgec-client"
         ;;
     server)
-        "$DIR/lua" "$DIR/bin/pgec-server"
+        "luajit" "$DIR/bin/pgec-server"
         ;;
     user)
-        "$DIR/lua" "$DIR/bin/pgec-user"
+        "luajit" "$DIR/bin/pgec-user"
         ;;
     *)
         echo "Invalid option: $1"

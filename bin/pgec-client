@@ -23,6 +23,8 @@ setup_paths()
 local socket = require('socket')
 local pgec = require('pgec')
 local bit = require('bit')
+local crypto = require('pgec.crypto')
+local protocol = require('pgec.protocol')
 
 print([[
 ╔═══════════════════════════════════════╗
@@ -459,7 +461,8 @@ local function main()
     if #users == 0 then
         print("\n❌ No user keypairs found!")
         print("\nCreate a user first:")
-        print("  ./examples/create_user.lua")
+        print("\n./bin/pgec-user")
+        print("\nIf you are connecting to a remote server that you don't even own, Don't even try, pgec-ws is NOT ready for prod setups!")
         return
     end
     
