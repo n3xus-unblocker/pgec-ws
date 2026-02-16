@@ -1,20 +1,16 @@
 name: Build & Test pgec-ws
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-
+  workflow_dispatch:
+    
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repo
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 2️⃣ Install LuaJIT + LuaRocks locally
       - name: Install LuaJIT & LuaRocks
         run: |
           sudo apt-get update
@@ -28,7 +24,6 @@ jobs:
           cd ..
           rm -rf luarocks-3.9.2 luarocks-3.9.2.tar.gz
 
-      # 4️⃣ Build rockspec and install dependencies
       - name: Build rockspec & Install dependencies
         run: |
           export LUAROCKS_PREFIX=$HOME/.luarocks
@@ -39,14 +34,12 @@ jobs:
           luarocks install lsqlite3 0.9.5-1 --local
           luarocks make pgec-ws-1.0-1.rockspec --local
 
-      # 5️⃣ Create test user (jigsaw)
       - name: Create test user
         run: |
           export LUA_PATH="./pgec/?.lua;./pgec/?/init.lua;;"
           export LUA_CPATH="$HOME/.luarocks/lib/lua/5.1/?.so;;"
           luajit examples/create_user.lua jigsaw
 
-      # 6️⃣ Start server
       - name: Start pgec-server
         run: |
           chmod +x ./bin/pgec-server
@@ -56,7 +49,6 @@ jobs:
           echo $! > server.pid
           sleep 2
 
-      # 7️⃣ Run tests (excluding client_simple.lua)
       - name: Run tests
         run: |
           export LUA_PATH="./pgec/?.lua;./pgec/?/init.lua;;"
@@ -68,19 +60,16 @@ jobs:
             fi
           done
 
-      # 8️⃣ Stop server
       - name: Stop server
         if: always()
         run: kill $(cat server.pid) || true
 
-      # 9️⃣ Pack .rock
       - name: Pack rock
         run: |
           export LUAROCKS_PREFIX=$HOME/.luarocks
           export PATH=$HOME/.luarocks/bin:$PATH
           luarocks pack pgec-ws-1.0-1.rockspec --local
 
-      # 🔟 Upload artifact
       - name: Upload rock artifact
         uses: actions/upload-artifact@v4
         with:
