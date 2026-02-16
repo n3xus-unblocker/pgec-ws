@@ -4,30 +4,50 @@ Encrypted chatroom protocol with automatic key rotation and PGP + AES key encryp
 
 ## Installation
 ```bash
-luarocks install https://github.com/n3xus-unblocker/pgec-ws/raw/main/pgec-ws-1.0-1.src.rock
+sudo luarocks install https://github.com/n3xus-unblocker/pgec-ws/raw/main/pgec-ws-1.0-3.src.rock
 ```
 or
 ```bash
 git clone https://github.com/n3xus-unblocker/pgec-ws.git
 cd pgec-ws
-luarocks make pgec-ws-1.0-1.rockspec
+luarocks make pgec-ws-1.0-3.rockspec
 ```
+
+### Notice
+
+When installing pgec-ws, you may get this error:
+```bash
+Missing dependencies for pgec-ws 1.0-3:
+   luasocket >= 3.0, < 3.2 (not installed)
+```
+Please ignore it, I don't know why that happens, it might just be my computer but just know luasocket IS most likely installed when that shows up.
+
 ## Usage
 
 ### Start Server
 ```bash
-run.sh server
+chmod +x bin/pgec-server
+./bin/pgec-server
 ```
 
-### Create User
+### Create a User
 ```bash
-run.sh user
+chmod +x bin/pgec-user
+./bin/pgec-user
 ```
 
 ### Start Client
 ```bash
-run.sh client
+chmod +x bin/pgec-client
+./bin/pgec-client
 ```
+
+## To-Do List
+- [ ] Add genuine end-to-end encryption
+- [X] Fix Luarocks packages
+- [ ] Fix Github Actions
+- [ ] To stop vibecoding
+- [X] Fix some code
 
 ## Features
 
@@ -37,12 +57,6 @@ run.sh client
 -  WebSocket-based
 -  Cross-platform (Linux, Mac-OS, Unix-based/Unix-like operating systems)
 -  14 simple commands
-
-## To-Do List
-- [ ] Add genuine end-to-end encryption
-- [ ] Fix Luarocks packages and fix Github Actions
-- [ ] To stop vibecoding
-- [ ] Fix some code
 
 ## License
 
