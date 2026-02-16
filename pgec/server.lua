@@ -162,8 +162,9 @@ end
 function Server:handle_login(ws, params)
     local encrypted = params.value
     local uuid = params.id
+    local signed_username = params.sig  -- Client's signed username
     
-    if not encrypted or not uuid then
+    if not encrypted or not uuid or not signed_username then
         print('Invalid login command')
         return
     end
@@ -205,6 +206,12 @@ function Server:handle_login(ws, params)
         return
     end
     
+    -- Verify signature (client signed their username)
+    if not crypto.verify(username, signed_username, client.pubkey) then
+        print('Invalid username signature')
+        return
+    end
+    
     -- Generate session
     local session_key = crypto.generate_uuid_v7()
     self.db:create_session(session_key, uuid, os.time() + 24 * 60 * 60)
@@ -213,14 +220,13 @@ function Server:handle_login(ws, params)
     client.username = username
     client.session_key = session_key
     
-    -- Broadcast index
-    local signed_username = crypto.sign(username, user.pubkey)
+    -- Broadcast index with client's signature
     self:broadcast_to_all(protocol.build('index', {
-        value = signed_username,
+        value = signed_username,  -- Pass through client's signature
         id = uuid
     }))
     
-    -- Send welcome
+    -- Send welcome (encrypt with CLIENT's public key from hello)
     local aes_encrypted = crypto.encrypt_rsa(self.aes_key, client.pubkey)
     local session_encrypted = crypto.encrypt_rsa(session_key, client.pubkey)
     
