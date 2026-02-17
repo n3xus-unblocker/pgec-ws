@@ -4,7 +4,7 @@ Encrypted chatroom protocol with automatic key rotation and PGP + AES key encryp
 
 ## Installation
 ```bash
-sudo luarocks install https://github.com/n3xus-unblocker/pgec-ws/raw/main/pgec-ws-1.0-3.src.rock
+sudo luarocks install https://github.com/n3xus-unblocker/pgec-ws/raw/refs/heads/main/pgec-ws-1.0-3.src.rock
 ```
 or
 ```bash
